@@ -5,16 +5,16 @@ from matplotlib.ticker import MultipleLocator
 import random
 
 # ---------------------------------------------------------
-# 1. Page Configuration & CSS Styling
+# 1. إعداد الصفحة والتنسيقات (CSS)
 # ---------------------------------------------------------
 st.set_page_config(layout="wide", page_title="Calculus Generator")
 
 st.markdown("""
 <style>
-    /* General App Styling */
+    /* تنسيق عام */
     .stApp { text-align: center; font-family: sans-serif; }
     
-    /* Question Box Styling */
+    /* تنسيق صندوق السؤال */
     .question-box {
         background-color: #f8f9fa;
         padding: 20px;
@@ -42,7 +42,7 @@ st.markdown("""
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    /* Option Card Styling */
+    /* تنسيق البطاقة (الخيار) */
     div[data-testid="stVerticalBlockBorderWrapper"] {
         padding: 15px !important;
         background: white;
@@ -56,17 +56,16 @@ st.markdown("""
         box-shadow: 0 4px 8px rgba(13, 110, 253, 0.15);
     }
 
-    /* Letter Styling (A, B, C) */
+    /* الحرف A, B, C */
     .opt-letter {
         color: #d63384;
         font-size: 24px;
         font-weight: 900;
         display: block;
         margin-bottom: 10px;
-        text-align: center;
     }
 
-    /* English Option Text */
+    /* النص الإنجليزي */
     .opt-en {
         text-align: left;
         direction: ltr;
@@ -76,7 +75,7 @@ st.markdown("""
         font-weight: 500;
     }
 
-    /* Arabic Option Text - Fixed for RTL Alignment */
+    /* النص العربي - تم ضبطه ليكون يمين ليسار */
     .opt-ar {
         text-align: right; 
         direction: rtl;
@@ -88,7 +87,7 @@ st.markdown("""
         border-top: 1px dashed #e9ecef;
     }
 
-    /* Button Styling */
+    /* الأزرار */
     div[data-testid="column"] .stButton button {
         width: 100%;
         border-radius: 6px;
@@ -104,7 +103,7 @@ st.markdown("""
         border-color: #0d6efd;
     }
     
-    /* New Quiz Button */
+    /* زر محاولة جديدة */
     .new-quiz-btn button {
         background-color: #198754 !important;
         color: white !important;
@@ -115,18 +114,17 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# 2. Smart Question Generators
+# 2. مولد الأسئلة الذكي
 # ---------------------------------------------------------
 
 def generate_linear_question():
-    """Generates a question for a linear derivative function."""
+    """توليد سؤال لدالة خطية (مشتقة)"""
     r = random.randint(-3, 3)
     slope = random.choice([-1, 1])
     
     def func_prime(x): return slope * (x - r)
     
-    # We add spaces around LaTeX math inside the f-strings to prevent rendering issues
-    # Example: $ x={r} $ instead of $x={r}$
+    # تم إضافة مسافات حول المعادلات لحل مشكلة التنسيق
     if slope > 0:
         correct_en = rf"Dec on $(-\infty, {r})$, Inc on $({r}, \infty)$; Min at $x={r}$"
         correct_ar = rf"تناقص $(-\infty, {r})$، تزايد $({r}, \infty)$؛ صغرى عند $ x={r} $"
@@ -151,7 +149,7 @@ def generate_linear_question():
     }
 
 def generate_quadratic_question():
-    """Generates a question for a quadratic derivative function."""
+    """توليد سؤال لدالة تربيعية (مشتقة)"""
     roots = sorted(random.sample(range(-3, 4), 2))
     r1, r2 = roots[0], roots[1]
     a = random.choice([-0.5, 0.5])
@@ -183,7 +181,7 @@ def generate_quadratic_question():
     }
 
 def generate_touching_question():
-    """Generates a question for a repeated root (derivative touches axis)."""
+    """توليد سؤال لجذر مكرر (يمس المحور)"""
     r = random.randint(-2, 2)
     a = random.choice([-0.3, 0.3])
     def func_prime(x): return a * (x - r)**2
@@ -204,18 +202,18 @@ def generate_touching_question():
     }
 
 def generate_quiz():
-    """Compiles a new random quiz."""
+    """تكوين اختبار جديد"""
     q1 = generate_linear_question()
     q2 = generate_quadratic_question()
     q3 = generate_touching_question()
-    q4 = generate_linear_question() # Extra question type
+    q4 = generate_linear_question() # سؤال إضافي
     
     quiz = [q1, q2, q3, q4]
     random.shuffle(quiz)
     return quiz
 
 # ---------------------------------------------------------
-# 3. Session State Management
+# 3. إدارة الحالة (Session State)
 # ---------------------------------------------------------
 if 'quiz_data' not in st.session_state:
     st.session_state.quiz_data = generate_quiz()
@@ -249,14 +247,14 @@ def prev_question():
         st.session_state.selected_opt = None
 
 # ---------------------------------------------------------
-# 4. Plotting Function
+# 4. دالة الرسم
 # ---------------------------------------------------------
 def plot_derivative(func_prime, x_range=(-5, 5), y_range=(-5, 5)):
     x = np.linspace(x_range[0], x_range[1], 1000)
     y = func_prime(x)
     fig, ax = plt.subplots(figsize=(6, 3))
     
-    # Axis setup
+    # إعداد المحاور
     ax.spines['left'].set_position('zero')
     ax.spines['bottom'].set_position('zero')
     ax.spines['right'].set_color('none')
@@ -265,7 +263,7 @@ def plot_derivative(func_prime, x_range=(-5, 5), y_range=(-5, 5)):
     ax.yaxis.set_major_locator(MultipleLocator(1))
     ax.grid(True, which='both', linestyle=':', alpha=0.6)
     
-    # Plot line
+    # الرسم
     ax.plot(x, y, color='#0d6efd', linewidth=2.5)
     ax.text(x_range[1]*0.8, y_range[1]*0.8, "y = f'(x)", fontsize=12, color='#0d6efd', fontweight='bold')
     
@@ -275,17 +273,17 @@ def plot_derivative(func_prime, x_range=(-5, 5), y_range=(-5, 5)):
     return fig
 
 # ---------------------------------------------------------
-# 5. UI Rendering
+# 5. العرض (UI)
 # ---------------------------------------------------------
 
 current_quiz = st.session_state.quiz_data
 q_idx = st.session_state.q_index
 q_data = current_quiz[q_idx]
 
-# Progress Bar
+# شريط التقدم
 st.progress((q_idx + 1) / len(current_quiz))
 
-# 1. Question Box
+# 1. صندوق السؤال
 st.markdown(f"""
 <div class="question-box">
     <div class="q-en">Q{q_idx+1}: {q_data['q_en']}</div>
@@ -293,15 +291,15 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# 2. Graph
+# 2. الرسم البياني
 c1, c2, c3 = st.columns([1, 2, 1])
 with c2:
     st.pyplot(plot_derivative(q_data['func']))
 
 st.write("---")
 
-# 3. Options
-# Use a seed to ensure options stay in place when buttons are clicked
+# 3. الخيارات
+# استخدام seed لضمان ثبات الخيارات أثناء الضغط
 seed_val = q_idx + int(q_data['func'](0)*100)
 random.seed(seed_val)
 
@@ -321,39 +319,39 @@ for idx, col in enumerate(cols):
     option_map[letter] = opt
     
     with col:
-        # Option Card
+        # إطار البطاقة
         with st.container(border=True):
-            # Letter
+            # الحرف
             st.markdown(f"<div class='opt-letter'>{letter}</div>", unsafe_allow_html=True)
             
-            # English Text (LTR)
+            # النص الإنجليزي (LTR)
             st.markdown(f"<div class='opt-en'>{opt['en']}</div>", unsafe_allow_html=True)
             
-            # Arabic Text (RTL) - CSS class handles direction
+            # النص العربي (RTL) مع class CSS مخصص
             st.markdown(f"<div class='opt-ar'>{opt['ar']}</div>", unsafe_allow_html=True)
             
-            # Selection Button
+            # الزر
             if st.button(f"Choose {letter}", key=f"btn_{q_idx}_{letter}"):
                 check_answer(letter)
 
-# 4. Result Display
+# 4. النتيجة
 if st.session_state.answered:
     selected = st.session_state.selected_opt
     chosen_data = option_map[selected]
     
     st.write("")
     if chosen_data['is_correct']:
-        st.success(f"✅ Correct! Answer ({selected}) is correct.", icon="✅")
+        st.success(f"✅ Correct! الإجابة ({selected}) صحيحة.", icon="✅")
         st.balloons()
     else:
-        st.error(f"❌ Incorrect. You chose ({selected}).", icon="❌")
-        # Show Correct Answer
+        st.error(f"❌ Incorrect. لقد اخترت ({selected}).", icon="❌")
+        # عرض الإجابة الصحيحة
         correct_letter = [k for k, v in option_map.items() if v['is_correct']][0]
         correct_text = option_map[correct_letter]
         
         st.markdown(f"""
         <div style="background-color:#d1e7dd; color:#0f5132; padding:15px; border-radius:10px; text-align:center; border:1px solid #badbcc;">
-            <div style="font-weight:bold; font-size:18px; margin-bottom:10px;">The correct answer is: {correct_letter}</div>
+            <div style="font-weight:bold; font-size:18px; margin-bottom:10px;">الإجابة الصحيحة هي: {correct_letter}</div>
             <div style="direction:ltr;">{correct_text['en']}</div>
             <div style="direction:rtl; margin-top:5px;">{correct_text['ar']}</div>
         </div>
@@ -361,7 +359,7 @@ if st.session_state.answered:
 
 st.write("---")
 
-# 5. Controls (Nav & Reset)
+# 5. التحكم
 c_prev, c_new, c_next = st.columns([1, 2, 1])
 
 with c_prev:
